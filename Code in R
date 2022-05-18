@@ -1,0 +1,317 @@
+Decision Tree Coding
+#import csv file
+dry_bean <- read.csv("Dry_Bean_Dataset.csv",header = TRUE)
+
+#Inspect the dataset in R
+names(dry_bean)
+head(dry_bean)
+tail(dry_bean)
+summary(dry_bean)
+
+#To check the structure of data
+str(dry_bean)
+
+# as.factor function convert a column into a factor column. 
+dry_bean$class <- as.factor(dry_bean$Class)
+
+# 1 Boruta 
+install.packages('Boruta')
+library(Boruta)
+
+# Perform Boruta search
+boruta_output <- Boruta(class ~ .,data = na.omit(dry_bean),doTrace=2)
+
+names(boruta_output)
+# Get significant variables including tentatives
+
+boruta_signif <- getSelectedAttributes(boruta_output, withTentative = TRUE)
+print(boruta_signif) 
+
+# Do a tentative rough fix
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+# Variable Importance Scores
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp), ])  # descending sort
+
+# Plot variable importance
+plot(boruta_output, cex.axis=.7, las=2, xlab="", main="Variable Importance")
+
+
+#Cleaning variable names 
+
+#install the janitor package
+install.packages("janitor")
+
+#activate the janitor package
+library(janitor)
+dry_bean<- dry_bean %>%
+  janitor::clean_names()
+
+#install the tidyverse packages
+install.packages("tidyverse")
+#activate the tidyverse packages
+library(tidyverse)
+#rename major_axis_length column
+dry_bean<- dry_bean %>%
+  rename("maal" = "major_axis_length")
+
+#rename minor_axis_length column
+dry_bean<- dry_bean %>%
+  rename("mial" = "minor_axis_length")
+
+#checking missing values
+#install the skimr package
+install.packages("skimr")
+#activate the skimr package
+library(skimr)
+#apply skim function to data
+skim(dry_bean)
+
+
+dry_bean <- subset (dry_bean, select = -class)
+#Identifying outliers
+boxplot(dry_bean)
+boxplot(dry_bean$i_area)
+boxplot(dry_bean$perimeter)
+boxplot(dry_bean$maal)
+boxplot(dry_bean$mial)
+boxplot(dry_bean$aspect_ration)
+
+boxplot(dry_bean$eccentricity)
+boxplot(dry_bean$convex_area)
+boxplot(dry_bean$equiv_diameter)
+boxplot(dry_bean$extent)
+boxplot(dry_bean$solidity)
+
+boxplot(dry_bean$roundness)
+boxplot(dry_bean$compactness)
+boxplot(dry_bean$shape_factor1)
+boxplot(dry_bean$shape_factor3)
+boxplot(dry_bean$shape_factor4)
+
+#find the values of the outliers
+outlier_values_i_area<- boxplot.stats(dry_bean$i_area)$out
+outlier_values_perimeter<- boxplot.stats(dry_bean$perimeter)$out
+outlier_values_maal<- boxplot.stats(dry_bean$maal)$out
+outlier_values_mial<- boxplot.stats(dry_bean$mial)$out
+outlier_values_aspect_ration<- boxplot.stats(dry_bean$aspect_ration)$out
+
+outlier_values_eccentricity<- boxplot.stats(dry_bean$eccentricity)$out
+outlier_values_convex_area<- boxplot.stats(dry_bean$convex_area)$out
+outlier_values_equiv_diameter<- boxplot.stats(dry_bean$equiv_diameter)$out
+outlier_values_extent<- boxplot.stats(dry_bean$extent)$out
+outlier_values_solidity<- boxplot.stats(dry_bean$solidity)$out
+
+outlier_values_roundness<- boxplot.stats(dry_bean$roundness)$out
+outlier_values_compactness<- boxplot.stats(dry_bean$compactness)$out
+outlier_values_shape_factor1<- boxplot.stats(dry_bean$shape_factor1)$out
+outlier_values_shape_factor3<- boxplot.stats(dry_bean$shape_factor3)$out
+outlier_values_shape_factor4<- boxplot.stats(dry_bean$shape_factor4)$out
+
+
+#find the upper outliers
+upper_outliers_i_area<-outlier_values_i_area[outlier_values_i_area>mean(dry_bean$i_area)]
+upper_outliers_perimeter<-outlier_values_perimeter[outlier_values_perimeter>mean(dry_bean$perimeter)]
+upper_outliers_maal<-outlier_values_maal[outlier_values_maal>mean(dry_bean$maal)]
+upper_outliers_mial<-outlier_values_mial[outlier_values_mial>mean(dry_bean$mial)]
+upper_outliers_aspect_ration<-outlier_values_aspect_ration[outlier_values_aspect_ration>mean(dry_bean$aspect_ration)]
+
+upper_outliers_eccentricity<-outlier_values_eccentricity[outlier_values_eccentricity>mean(dry_bean$eccentricity)]
+upper_outliers_convex_area<-outlier_values_convex_area[outlier_values_convex_area>mean(dry_bean$convex_area)]
+upper_outliers_equiv_diameter<-outlier_values_equiv_diameter[outlier_values_equiv_diameter>mean(dry_bean$equiv_diameter)]
+upper_outliers_extent<-outlier_values_extent[outlier_values_extent>mean(dry_bean$extent)]
+upper_outliers_solidity<-outlier_values_solidity[outlier_values_solidity>mean(dry_bean$solidity)]
+
+upper_outliers_roundness<-outlier_values_roundness[outlier_values_roundness>mean(dry_bean$roundness)]
+upper_outliers_compactness<-outlier_values_compactness[outlier_values_compactness>mean(dry_bean$compactness)]
+upper_outliers_shape_factor1<-outlier_values_shape_factor1[outlier_values_shape_factor1>mean(dry_bean$shape_factor1)]
+upper_outliers_shape_factor3<-outlier_values_shape_factor3[outlier_values_shape_factor3>mean(dry_bean$shape_factor3)]
+upper_outliers_shape_factor4<-outlier_values_shape_factor4[outlier_values_shape_factor4>mean(dry_bean$shape_factor4)]
+
+
+#find the lower outliers
+lower_outliers_i_area<-outlier_values_i_area[outlier_values_i_area<mean(dry_bean$i_area)]
+lower_outliers_perimeter<-outlier_values_perimeter[outlier_values_perimeter<mean(dry_bean$perimeter)]
+lower_outliers_maal<-outlier_values_maal[outlier_values_maal<mean(dry_bean$maal)]
+lower_outliers_mial<-outlier_values_mial[outlier_values_mial<mean(dry_bean$mial)]
+lower_outliers_aspect_ration<-outlier_values_aspect_ration[outlier_values_aspect_ration<mean(dry_bean$aspect_ration)]
+
+lower_outliers_eccentricity<-outlier_values_eccentricity[outlier_values_eccentricity<mean(dry_bean$eccentricity)]
+lower_outliers_convex_area<-outlier_values_convex_area[outlier_values_convex_area<mean(dry_bean$convex_area)]
+lower_outliers_equiv_diameter<-outlier_values_equiv_diameter[outlier_values_equiv_diameter<mean(dry_bean$equiv_diameter)]
+lower_outliers_extent<-outlier_values_extent[outlier_values_extent<mean(dry_bean$extent)]
+lower_outliers_solidity<-outlier_values_solidity[outlier_values_solidity<mean(dry_bean$solidity)]
+
+lower_outliers_roundness<-outlier_values_roundness[outlier_values_roundness<mean(dry_bean$roundness)]
+lower_outliers_compactness<-outlier_values_compactness[outlier_values_compactness<mean(dry_bean$compactness)]
+lower_outliers_shape_factor1<-outlier_values_shape_factor1[outlier_values_shape_factor1<mean(dry_bean$shape_factor1)]
+lower_outliers_shape_factor3<-outlier_values_shape_factor3[outlier_values_shape_factor3<mean(dry_bean$shape_factor3)]
+lower_outliers_shape_factor4<-outlier_values_shape_factor4[outlier_values_shape_factor4<mean(dry_bean$shape_factor4)]
+
+
+#find the indices that correspond to upper and lower outliers
+upper_indices_i_area<- which(dry_bean$i_area %in% upper_outliers_i_area)
+upper_indices_perimeter<- which(dry_bean$perimeter %in% upper_outliers_perimeter)
+upper_indices_maal<- which(dry_bean$maal %in% upper_outliers_maal)
+upper_indices_mial<- which(dry_bean$mial %in% upper_outliers_mial)
+upper_indices_aspect_ration<- which(dry_bean$aspect_ration %in% upper_outliers_aspect_ration)
+
+upper_indices_eccentricity<- which(dry_bean$eccentricity %in% upper_outliers_eccentricity)
+upper_indices_convex_area<- which(dry_bean$convex_area %in% upper_outliers_convex_area)
+upper_indices_equiv_diameter<- which(dry_bean$equiv_diameter %in% upper_outliers_equiv_diameter)
+upper_indices_extent<- which(dry_bean$extent %in% upper_outliers_extent)
+upper_indices_solidity<- which(dry_bean$solidity %in% upper_outliers_solidity)
+
+upper_indices_roundness<- which(dry_bean$roundness %in% upper_outliers_roundness)
+upper_indices_compactness<- which(dry_bean$compactness %in% upper_outliers_compactness)
+upper_indices_shape_factor1<- which(dry_bean$shape_factor1 %in% upper_outliers_shape_factor1)
+upper_indices_shape_factor3<- which(dry_bean$shape_factor3 %in% upper_outliers_shape_factor3)
+upper_indices_shape_factor4<- which(dry_bean$shape_factor4 %in% upper_outliers_shape_factor4)
+
+
+lower_indices_i_area<- which(dry_bean$i_area %in% lower_outliers_i_area)
+lower_indices_perimeter<- which(dry_bean$perimeter %in% lower_outliers_perimeter)
+lower_indices_maal<- which(dry_bean$maal %in% lower_outliers_maal)
+lower_indices_mial<- which(dry_bean$mial %in% lower_outliers_mial)
+lower_indices_aspect_ration<- which(dry_bean$aspect_ration %in% lower_outliers_aspect_ration)
+
+lower_indices_eccentricity<- which(dry_bean$eccentricity %in% lower_outliers_eccentricity)
+lower_indices_convex_area<- which(dry_bean$convex_area %in% lower_outliers_convex_area)
+lower_indices_equiv_diameter<- which(dry_bean$equiv_diameter %in% lower_outliers_equiv_diameter)
+lower_indices_extent<- which(dry_bean$extent %in% lower_outliers_extent)
+lower_indices_solidity<- which(dry_bean$solidity %in% lower_outliers_solidity)
+
+lower_indices_roundness<- which(dry_bean$roundness %in% lower_outliers_roundness)
+lower_indices_compactness<- which(dry_bean$compactness %in% lower_outliers_compactness)
+lower_indices_shape_factor1<- which(dry_bean$shape_factor1 %in% lower_outliers_shape_factor1)
+lower_indices_shape_factor3<- which(dry_bean$shape_factor3 %in% lower_outliers_shape_factor3)
+lower_indices_shape_factor4<- which(dry_bean$shape_factor4 %in% lower_outliers_shape_factor4)
+
+#replace the upper and lower outliers with the upper and lower whisker values respectively
+dry_bean$i_area[upper_indices_i_area]<-boxplot.stats(dry_bean$i_area)$stats[5]
+dry_bean$perimeter[upper_indices_perimeter]<-boxplot.stats(dry_bean$perimeter)$stats[5]
+dry_bean$maal[upper_indices_maal]<-boxplot.stats(dry_bean$maal)$stats[5]
+dry_bean$mial[upper_indices_mial]<-boxplot.stats(dry_bean$mial)$stats[5]
+dry_bean$aspect_ration[upper_indices_aspect_ration]<-boxplot.stats(dry_bean$aspect_ration)$stats[5]
+
+dry_bean$eccentricity[upper_indices_eccentricity]<-boxplot.stats(dry_bean$eccentricity)$stats[5]
+dry_bean$convex_area[upper_indices_convex_area]<-boxplot.stats(dry_bean$convex_area)$stats[5]
+dry_bean$equiv_diameter[upper_indices_equiv_diameter]<-boxplot.stats(dry_bean$equiv_diameter)$stats[5]
+dry_bean$extent[upper_indices_extent]<-boxplot.stats(dry_bean$extent)$stats[5]
+dry_bean$solidity[upper_indices_solidity]<-boxplot.stats(dry_bean$solidity)$stats[5]
+
+dry_bean$roundness[upper_indices_roundness]<-boxplot.stats(dry_bean$roundness)$stats[5]
+dry_bean$compactness[upper_indices_compactness]<-boxplot.stats(dry_bean$compactness)$stats[5]
+dry_bean$shape_factor1[upper_indices_shape_factor1]<-boxplot.stats(dry_bean$shape_factor1)$stats[5]
+dry_bean$shape_factor3[upper_indices_shape_factor3]<-boxplot.stats(dry_bean$shape_factor3)$stats[5]
+dry_bean$shape_factor4[upper_indices_shape_factor4]<-boxplot.stats(dry_bean$shape_factor4)$stats[5]
+
+
+dry_bean$i_area[lower_indices_i_area]<-boxplot.stats(dry_bean$i_area)$stats[1]
+dry_bean$perimeter[lower_indices_perimeter]<-boxplot.stats(dry_bean$perimeter)$stats[1]
+dry_bean$maal[lower_indices_maal]<-boxplot.stats(dry_bean$maal)$stats[1]
+dry_bean$mial[lower_indices_mial]<-boxplot.stats(dry_bean$mial)$stats[1]
+dry_bean$aspect_ration[lower_indices_aspect_ration]<-boxplot.stats(dry_bean$aspect_ration)$stats[1]
+
+dry_bean$eccentricity[lower_indices_eccentricity]<-boxplot.stats(dry_bean$eccentricity)$stats[1]
+dry_bean$convex_area[lower_indices_convex_area]<-boxplot.stats(dry_bean$convex_area)$stats[1]
+dry_bean$equiv_diameter[lower_indices_equiv_diameter]<-boxplot.stats(dry_bean$equiv_diameter)$stats[1]
+dry_bean$extent[lower_indices_extent]<-boxplot.stats(dry_bean$extent)$stats[1]
+dry_bean$solidity[lower_indices_solidity]<-boxplot.stats(dry_bean$solidity)$stats[1]
+
+dry_bean$roundness[lower_indices_roundness]<-boxplot.stats(dry_bean$roundness)$stats[1]
+dry_bean$compactness[lower_indices_compactness]<-boxplot.stats(dry_bean$compactness)$stats[1]
+dry_bean$shape_factor1[lower_indices_shape_factor1]<-boxplot.stats(dry_bean$shape_factor1)$stats[1]
+dry_bean$shape_factor3[lower_indices_shape_factor3]<-boxplot.stats(dry_bean$shape_factor3)$stats[1]
+dry_bean$shape_factor4[lower_indices_shape_factor4]<-boxplot.stats(dry_bean$shape_factor4)$stats[1]
+
+
+#boxplot(dry_bean$i_area)
+boxplot(dry_bean)
+
+print(dry_bean)
+write.csv(dry_bean,"C:\\Users\\benaz\\OneDrive\\Desktop\\Dry_Bean_Data.csv", row.names = FALSE)
+
+#Check the dimension and number of points of the "dry_bean" dataset
+nrow(dry_bean) #number of data rows in the data frame 
+ncol(dry_bean) #number of columns in the data frame
+dim(dry_bean) # function Retrieve the dimension of an object.
+
+
+#To check the structure of data
+str(dry_bean)
+
+#set.seed function in R is used to reproduce results i.e. it produces the same sample again and again. 
+set.seed(1234)
+
+#sample function can be used to return a random permutation of a vector. 
+pd <- sample(2, nrow(dry_bean),replace = TRUE,prob = c(0.8,0.2)) 
+pd
+
+train <- dry_bean[pd==1,]
+validate <- dry_bean[pd==2,]
+
+# install "rpart" package. Ignore installation if "rpart" package was already installed. You can run library() to find out this.
+install.packages("rpart")
+install.packages("rpart.plot")
+
+# activate "rpart" package
+library(rpart)
+dry_bean_tree <-rpart(class_2 ~ .,data = train,method = "class")
+
+library(rpart.plot)
+#Train the tree using ctree() function in rpart package. 
+
+dry_bean_tree
+
+#draw the tree
+print(dry_bean_tree)
+
+#plot the tree
+rpart.plot(dry_bean_tree,extra = 1)
+
+
+##To find accuracy use party package
+# install "party" package. Ignore installation if "party" package was already installed. You can run library() to find out this.
+install.packages("party")
+
+# activate "party" package
+library(party)
+
+#Train the tree using ctree() function in party package. 
+dry_bean_tree <- ctree(class_2 ~ .,data = train,controls = ctree_control(mincriterion = 0.99,minsplit = 50 ))
+dry_bean_tree
+
+
+#plot the tree
+plot(dry_bean_tree)
+
+plot(dry_bean_tree,type="simple")
+
+#Following code is going to check the prediction on train data itself. 
+predict(dry_bean_tree)
+
+#generate frequency tables using the table( ) function.
+tab <- table(predict(dry_bean_tree), train$class_2) 
+print(tab)
+
+#Calculate classification accuracy and error on train data itself.
+#diag() function extracts the diagonal of a matrix
+sum(diag(tab))/sum(tab)
+1-sum(diag(tab))/sum(tab)
+
+#validate the model on test data set.
+test_predict <- table(predict(dry_bean_tree, newdata= validate),validate$class_2)
+print(test_predict)
+
+
+
+
+#.Calculate classification accuracy and error on test data set
+sum(diag(test_predict))/sum(test_predict)
+
+1-sum(diag(test_predict))/sum(test_predict)
