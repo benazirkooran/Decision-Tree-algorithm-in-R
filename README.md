@@ -1,2 +1,3 @@
 # Decision-Tree-algorithm-in-R
 Classification accuracy using Decision Tree algorithm in both R 
+Data classification is method of data mining and knowledge management strategy for grouping together comparable data elements(Priyam et al., 2013). In its most basic form, decision tree analysis is a divide-and-conquer strategy to classification. In big datasets, decision trees may be used to identify characteristics and extract patterns that are crucial for discriminating and predictive modelling(Myles et al., 2004). The fundamental goal of this paper is to use the decision tree technique to get the categorisation accuracy and discuss the error rates of the seven different dry beans using R .
